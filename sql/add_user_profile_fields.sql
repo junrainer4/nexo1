@@ -1,5 +1,3 @@
--- Nexo – Add optional profile fields to users table
--- Run this if you already have an existing nexo database (after nexo_app.sql was imported).
 
 
 ALTER TABLE users

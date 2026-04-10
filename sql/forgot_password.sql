@@ -1,5 +1,3 @@
--- Nexo – Password Reset Table
--- Run this after nexo_app.sql and navbar_features.sql
 
 
 CREATE TABLE IF NOT EXISTS password_resets (
@@ -12,5 +10,4 @@ CREATE TABLE IF NOT EXISTS password_resets (
     INDEX idx_email (email)
 );
 
--- Migration for existing installs: add the code column if it is missing.
 ALTER TABLE password_resets ADD COLUMN IF NOT EXISTS code CHAR(6) NOT NULL DEFAULT '';

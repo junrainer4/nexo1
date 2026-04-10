@@ -1,5 +1,3 @@
--- Nexo – Comment Likes
--- Run this after nexo_app.sql
 
 
 CREATE TABLE IF NOT EXISTS comment_likes (
