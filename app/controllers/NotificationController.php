@@ -21,7 +21,7 @@ class NotificationController {
                        u.profile_image as actor_image
                 FROM notifications n
                 JOIN users u ON n.actor_id = u.id
-                WHERE n.user_id = ? AND n.is_read = FALSE
+                WHERE n.user_id = ?
                 ORDER BY n.created_at DESC
                 LIMIT 20
             ");
