@@ -1,4 +1,3 @@
-
 input[type="password"]::-ms-reveal,
 input[type="password"]::-webkit-credentials-auto-fill-button { display: none !important; }
 input[type="password"]::-webkit-textfield-decoration-container { display: none; }
@@ -3751,8 +3750,20 @@ select.modal-input {
 }
 
 .comment-action-btn.liked {
-    color: var(--primary);
+    color: #e0245e;
     font-weight: 600;
+}
+
+.reply-input-wrap {
+    padding-left: 4px;
+}
+
+.reply-form {
+    gap: 6px;
+}
+
+.reply-input {
+    font-size: 12.5px;
 }
 
 .toast {

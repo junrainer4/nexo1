@@ -119,14 +119,14 @@ require __DIR__ . '/../partials/header.php';
 
                 <?php if ($post['user_id'] == $_SESSION['user_id']): ?>
                 <div style="position:relative;">
-                    <button class="post-menu-btn" onclick="togglePostMenu(<?= $post['id'] ?>)">
+                    <button type="button" class="post-menu-btn" onclick="togglePostMenu(<?= $post['id'] ?>)">
                         <i class="fa fa-ellipsis-h"></i>
                     </button>
                     <div class="post-dropdown" id="post-menu-<?= $post['id'] ?>">
-                        <button onclick="openEditPost(<?= $post['id'] ?>, <?= htmlspecialchars(json_encode($post['content'])) ?>, <?= htmlspecialchars(json_encode($post['visibility'] ?? 'public')) ?>)">
+                        <button type="button" onclick="openEditPost(<?= $post['id'] ?>, <?= htmlspecialchars(json_encode($post['content'])) ?>, <?= htmlspecialchars(json_encode($post['visibility'] ?? 'public')) ?>)">
                             <i class="fa fa-pen"></i> Edit post
                         </button>
-                        <button class="danger-item" onclick="confirmDeletePost(<?= $post['id'] ?>)">
+                        <button type="button" class="danger-item" onclick="confirmDeletePost(<?= $post['id'] ?>)">
                             <i class="fa fa-trash"></i> Delete post
                         </button>
                     </div>
@@ -169,16 +169,16 @@ require __DIR__ . '/../partials/header.php';
             </div>
 
             <div class="post-footer">
-                <button class="reaction-btn <?= $post['user_liked'] ? 'liked' : '' ?>"
+                <button type="button" class="reaction-btn <?= $post['user_liked'] ? 'liked' : '' ?>"
                         onclick="toggleLike(<?= $post['id'] ?>, this)">
                     <i class="<?= $post['user_liked'] ? 'fa-solid' : 'fa-regular' ?> fa-heart"></i>
                     <span class="like-count"><?= $post['like_count'] > 0 ? $post['like_count'] : '' ?></span>
                 </button>
-                <button class="reaction-btn" onclick="toggleComments(<?= $post['id'] ?>)">
+                <button type="button" class="reaction-btn" onclick="toggleComments(<?= $post['id'] ?>)">
                     <i class="fa-regular fa-comment"></i>
                     <span><?= $post['comment_count'] > 0 ? $post['comment_count'] : '' ?></span>
                 </button>
-                <button class="reaction-btn save-btn" onclick="toggleSave(<?= $post['id'] ?>, this)" title="Save post"
+                <button type="button" class="reaction-btn save-btn" onclick="toggleSave(<?= $post['id'] ?>, this)" title="Save post"
                         data-saved="<?= !empty($post['user_saved']) ? '1' : '0' ?>">
                     <i class="<?= !empty($post['user_saved']) ? 'fa-solid' : 'fa-regular' ?> fa-bookmark"></i>
                 </button>
@@ -197,15 +197,26 @@ require __DIR__ . '/../partials/header.php';
                             <p class="comment-text"><?= nl2br(htmlspecialchars($c['content'])) ?></p>
                         </div>
                         <div class="comment-meta-row">
-                            <span class="comment-time"><time class="live-time" data-time="<?= htmlspecialchars(time_iso($c['created_at'])) ?>"><?= time_ago($c['created_at']) ?></time></span>
-                            <button class="comment-action-btn <?= !empty($c['user_liked']) ? 'liked' : '' ?>"
+                            <span class="comment-time">
+                                <time class="live-time" data-time="<?= htmlspecialchars(time_iso($c['created_at'])) ?>">
+                                    <?= time_ago($c['created_at']) ?>
+                                </time>
+                            </span>
+                            <button type="button"
+                                    class="comment-action-btn <?= !empty($c['user_liked']) ? 'liked' : '' ?>"
                                     onclick="toggleCommentLike(<?= (int)$c['id'] ?>, this)">
-                                <span class="comment-like-label"><?= !empty($c['user_liked']) ? 'Unlike' : 'Like' ?></span>
-                                <span class="comment-like-count"><?= !empty($c['like_count']) ? (int)$c['like_count'] : '' ?></span>
+                                <i class="<?= !empty($c['user_liked']) ? 'fa-solid' : 'fa-regular' ?> fa-heart"></i>
+                                <span class="comment-like-count"><?= !empty($c['like_count']) && $c['like_count'] > 0 ? (int)$c['like_count'] : '' ?></span>
                             </button>
-                            <button class="comment-action-btn">Reply</button>
+                            <button type="button"
+                                    class="comment-action-btn"
+                                    onclick="toggleReplyBox(<?= (int)$c['id'] ?>, <?= (int)$post['id'] ?>, <?= htmlspecialchars(json_encode($c['full_name'])) ?>)">
+                                Reply
+                            </button>
                             <?php if ($c['user_id'] == $_SESSION['user_id']): ?>
-                                <button class="comment-action-btn"
+                                <!-- FIX: type="button" prevents form submission -->
+                                <button type="button"
+                                        class="comment-action-btn"
                                         onclick="openEditComment(<?= $c['id'] ?>, <?= htmlspecialchars(json_encode($c['content'])) ?>)">
                                     Edit
                                 </button>
@@ -218,6 +229,22 @@ require __DIR__ . '/../partials/header.php';
                                 </form>
                             <?php endif; ?>
                         </div>
+
+                        <div class="reply-input-wrap" id="reply-box-<?= $c['id'] ?>" style="display:none; margin-top:6px;">
+                            <form class="comment-input-row reply-form" onsubmit="submitReply(event, <?= (int)$post['id'] ?>)">
+                                <?= Security::field() ?>
+                                <input type="hidden" name="post_id" value="<?= (int)$post['id'] ?>">
+                                <input type="hidden" name="parent_comment_id" value="<?= (int)$c['id'] ?>">
+                                <div class="comment-input-wrap">
+                                    <input type="text" name="content" class="comment-input reply-input"
+                                           placeholder="Write a reply..." required>
+                                    <button type="submit" class="comment-send-btn">
+                                        <i class="fa fa-paper-plane"></i>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
                     </div>
                 </div>
                 <?php endforeach; ?>
@@ -248,7 +275,7 @@ require __DIR__ . '/../partials/header.php';
     <div class="modal">
         <div class="modal-header">
             <span class="modal-title">Edit Post</span>
-            <button class="modal-close" onclick="closeModal('edit-post-modal')">
+            <button type="button" class="modal-close" onclick="closeModal('edit-post-modal')">
                 <i class="fa fa-xmark"></i>
             </button>
         </div>
@@ -298,7 +325,7 @@ require __DIR__ . '/../partials/header.php';
     <div class="modal">
         <div class="modal-header">
             <span class="modal-title">Edit Comment</span>
-            <button class="modal-close" onclick="closeModal('edit-comment-modal')">
+            <button type="button" class="modal-close" onclick="closeModal('edit-comment-modal')">
                 <i class="fa fa-xmark"></i>
             </button>
         </div>

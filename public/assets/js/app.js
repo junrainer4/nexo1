@@ -1,4 +1,3 @@
-
 function togglePass(inputId, btn) {
     const input = document.getElementById(inputId);
     const icon  = btn.querySelector('i');
@@ -825,13 +824,60 @@ function toggleCommentLike(commentId, btn) {
         .then(data => {
             if (!data || data.success === false) return;
             btn.classList.toggle('liked', !!data.liked);
-            const lbl = btn.querySelector('.comment-like-label');
+            const icon = btn.querySelector('i');
+            if (icon) {
+                icon.className = data.liked ? 'fa-solid fa-heart' : 'fa-regular fa-heart';
+            }
             const cnt = btn.querySelector('.comment-like-count');
-            if (lbl) lbl.textContent = data.liked ? 'Unlike' : 'Like';
-            if (cnt) cnt.textContent = data.count > 0 ? data.count : '';
+if (cnt) cnt.textContent = data.count > 0 ? data.count : '';
+const label = btn.querySelector('.comment-like-label');
+if (label) label.textContent = data.liked ? 'Unlike' : 'Like';
         })
         .catch(() => {})
         .finally(() => { btn.disabled = false; });
+}
+
+function toggleReplyBox(commentId, postId, authorName) {
+    const box = document.getElementById('reply-box-' + commentId);
+    if (!box) return;
+    const isHidden = box.style.display === 'none' || box.style.display === '';
+    // Close all other reply boxes in this post
+    const postEl = document.getElementById('post-' + postId);
+    if (postEl) {
+        postEl.querySelectorAll('.reply-input-wrap').forEach(el => {
+            if (el !== box) el.style.display = 'none';
+        });
+    }
+    box.style.display = isHidden ? 'block' : 'none';
+    if (isHidden) {
+        const input = box.querySelector('.reply-input');
+        if (input) {
+            input.value = '@' + authorName + ' ';
+            input.focus();
+            input.setSelectionRange(input.value.length, input.value.length);
+        }
+    }
+}
+
+function submitReply(e, postId) {
+    e.preventDefault();
+    const form = e.target;
+    const input = form.querySelector('input[name="content"]');
+    if (!input || !input.value.trim()) return;
+
+    const fd = new FormData(form);
+    const sendBtn = form.querySelector('button[type="submit"]');
+    if (sendBtn) sendBtn.disabled = true;
+
+    fetch('index.php?url=comment/add', { method: 'POST', body: fd })
+        .then(r => {
+            // comment/add does a redirect on success — just reload the comments
+            if (r.ok || r.redirected) {
+                window.location.reload();
+            }
+        })
+        .catch(() => { window.location.reload(); })
+        .finally(() => { if (sendBtn) sendBtn.disabled = false; });
 }
 
 function showSettingsPanel(name, btn) {

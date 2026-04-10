@@ -35,7 +35,6 @@ require __DIR__ . '/../partials/header.php';
                 <input id="cover-quick-input" type="file" name="cover_image" accept="image/*" hidden>
             </form>
         <?php endif; ?>
-        <!-- Avatar -->
         <div class="profile-avatar-wrap">
             <img src="assets/uploads/<?= htmlspecialchars($user['profile_image']) ?>"
                  alt="avatar" class="profile-avatar-img"
@@ -59,19 +58,19 @@ require __DIR__ . '/../partials/header.php';
                     <i class="fa fa-comment"></i> Message
                 </a>
                 <?php if ($friendshipStatus === 'friends'): ?>
-                    <button class="btn btn-ghost btn-sm" id="friend-btn-<?= $user['id'] ?>" onclick="handleUnfriend(<?= $user['id'] ?>)">
+                    <button type="button" class="btn btn-ghost btn-sm" id="friend-btn-<?= $user['id'] ?>" onclick="handleUnfriend(<?= $user['id'] ?>)">
                         <i class="fa fa-user-check"></i> <span>Friends</span>
                     </button>
                 <?php elseif ($friendshipStatus === 'pending_sent'): ?>
-                    <button class="btn btn-ghost btn-sm" id="friend-btn-<?= $user['id'] ?>" disabled>
+                    <button type="button" class="btn btn-ghost btn-sm" id="friend-btn-<?= $user['id'] ?>" disabled>
                         <i class="fa fa-clock"></i> <span>Pending</span>
                     </button>
                 <?php elseif ($friendshipStatus === 'pending_received'): ?>
-                    <button class="btn btn-primary btn-sm" id="friend-btn-<?= $user['id'] ?>" onclick="handleAcceptRequest(<?= $user['id'] ?>)">
+                    <button type="button" class="btn btn-primary btn-sm" id="friend-btn-<?= $user['id'] ?>" onclick="handleAcceptRequest(<?= $user['id'] ?>)">
                         <i class="fa fa-user-plus"></i> <span>Accept Request</span>
                     </button>
                 <?php else: ?>
-                    <button class="btn btn-primary btn-sm" id="friend-btn-<?= $user['id'] ?>" onclick="handleFriendAction(<?= $user['id'] ?>)">
+                    <button type="button" class="btn btn-primary btn-sm" id="friend-btn-<?= $user['id'] ?>" onclick="handleFriendAction(<?= $user['id'] ?>)">
                         <i class="fa fa-user-plus"></i> <span>Add Friend</span>
                     </button>
                 <?php endif; ?>
@@ -133,14 +132,14 @@ require __DIR__ . '/../partials/header.php';
                         </div>
                         <?php if ($isOwner): ?>
                         <div style="position:relative;">
-                            <button class="post-menu-btn" onclick="togglePostMenu(<?= $post['id'] ?>)">
+                            <button type="button" class="post-menu-btn" onclick="togglePostMenu(<?= $post['id'] ?>)">
                                 <i class="fa fa-ellipsis-h"></i>
                             </button>
                             <div class="post-dropdown" id="post-menu-<?= $post['id'] ?>">
-                                <button onclick="openEditPost(<?= $post['id'] ?>, <?= htmlspecialchars(json_encode($post['content'])) ?>, <?= htmlspecialchars(json_encode($post['visibility'] ?? 'public')) ?>)">
+                                <button type="button" onclick="openEditPost(<?= $post['id'] ?>, <?= htmlspecialchars(json_encode($post['content'])) ?>, <?= htmlspecialchars(json_encode($post['visibility'] ?? 'public')) ?>)">
                                     <i class="fa fa-pen"></i> Edit post
                                 </button>
-                                <button class="danger-item" onclick="confirmDeletePost(<?= $post['id'] ?>)">
+                                <button type="button" class="danger-item" onclick="confirmDeletePost(<?= $post['id'] ?>)">
                                     <i class="fa fa-trash"></i> Delete post
                                 </button>
                             </div>
@@ -183,19 +182,19 @@ require __DIR__ . '/../partials/header.php';
                     </div>
 
                     <div class="post-footer">
-                        <button class="reaction-btn <?= $post['user_liked'] ? 'liked' : '' ?>"
+                        <button type="button" class="reaction-btn <?= $post['user_liked'] ? 'liked' : '' ?>"
                                 onclick="toggleLike(<?= $post['id'] ?>, this)">
                             <i class="<?= $post['user_liked'] ? 'fa-solid' : 'fa-regular' ?> fa-heart"></i>
                             <span class="like-count"><?= $post['like_count'] > 0 ? $post['like_count'] : '' ?></span>
                         </button>
-                        <button class="reaction-btn" onclick="toggleComments(<?= $post['id'] ?>)">
+                        <button type="button" class="reaction-btn" onclick="toggleComments(<?= $post['id'] ?>)">
                             <i class="fa-regular fa-comment"></i>
                             <span><?= $post['comment_count'] > 0 ? $post['comment_count'] : '' ?></span>
                         </button>
-                        <button class="reaction-btn">
+                        <button type="button" class="reaction-btn">
                             <i class="fa-regular fa-share-from-square"></i>
                         </button>
-                        <button class="reaction-btn save-btn" onclick="toggleSave(<?= $post['id'] ?>, this)" title="Save post"
+                        <button type="button" class="reaction-btn save-btn" onclick="toggleSave(<?= $post['id'] ?>, this)" title="Save post"
                                 data-saved="<?= !empty($post['user_saved']) ? '1' : '0' ?>">
                             <i class="<?= !empty($post['user_saved']) ? 'fa-solid' : 'fa-regular' ?> fa-bookmark"></i>
                         </button>
@@ -203,7 +202,7 @@ require __DIR__ . '/../partials/header.php';
 
                     <div class="comments-section" id="comments-<?= $post['id'] ?>" style="display:none;">
                         <?php foreach ($comments as $c): ?>
-                        <div class="comment-row">
+                        <div class="comment-row" id="comment-<?= $c['id'] ?>">
                             <img src="assets/uploads/<?= htmlspecialchars($c['profile_image']) ?>"
                                  alt="avatar" class="avatar-sm"
                                  onerror="this.onerror=null; this.src='assets/images/default-profile.webp'">
@@ -213,15 +212,29 @@ require __DIR__ . '/../partials/header.php';
                                     <p class="comment-text"><?= nl2br(htmlspecialchars($c['content'])) ?></p>
                                 </div>
                                 <div class="comment-meta-row">
-                                    <span class="comment-time"><time class="live-time" data-time="<?= htmlspecialchars(time_iso($c['created_at'])) ?>"><?= time_ago($c['created_at']) ?></time></span>
-                                    <button class="comment-action-btn <?= !empty($c['user_liked']) ? 'liked' : '' ?>"
+                                    <span class="comment-time">
+                                        <time class="live-time" data-time="<?= htmlspecialchars(time_iso($c['created_at'])) ?>"><?= time_ago($c['created_at']) ?></time>
+                                    </span>
+
+                                    <button type="button"
+                                            class="comment-action-btn <?= !empty($c['user_liked']) ? 'liked' : '' ?>"
                                             onclick="toggleCommentLike(<?= (int)$c['id'] ?>, this)">
-                                        <span class="comment-like-label"><?= !empty($c['user_liked']) ? 'Unlike' : 'Like' ?></span>
-                                        <span class="comment-like-count"><?= !empty($c['like_count']) ? (int)$c['like_count'] : '' ?></span>
+                                        <i class="<?= !empty($c['user_liked']) ? 'fa-solid' : 'fa-regular' ?> fa-heart"></i>
+                                        <span class="comment-like-count"><?= !empty($c['like_count']) && $c['like_count'] > 0 ? (int)$c['like_count'] : '' ?></span>
                                     </button>
+
+                                    <button type="button"
+                                            class="comment-action-btn"
+                                            onclick="toggleReplyBox(<?= (int)$c['id'] ?>, <?= (int)$post['id'] ?>, <?= htmlspecialchars(json_encode($c['full_name'])) ?>)">
+                                        Reply
+                                    </button>
+
                                     <?php if ($c['user_id'] == $_SESSION['user_id']): ?>
-                                        <button class="comment-action-btn"
-                                                onclick="openEditComment(<?= $c['id'] ?>, <?= htmlspecialchars(json_encode($c['content'])) ?>)">Edit</button>
+                                        <button type="button"
+                                                class="comment-action-btn"
+                                                onclick="openEditComment(<?= $c['id'] ?>, <?= htmlspecialchars(json_encode($c['content'])) ?>)">
+                                            Edit
+                                        </button>
                                         <form action="index.php?url=comment/delete" method="POST"
                                               style="display:inline" onsubmit="return confirm('Delete comment?')">
                                             <?= Security::field() ?>
@@ -231,9 +244,26 @@ require __DIR__ . '/../partials/header.php';
                                         </form>
                                     <?php endif; ?>
                                 </div>
+
+                                <div class="reply-input-wrap" id="reply-box-<?= $c['id'] ?>" style="display:none; margin-top:6px;">
+                                    <form class="comment-input-row reply-form" onsubmit="submitReply(event, <?= (int)$post['id'] ?>)">
+                                        <?= Security::field() ?>
+                                        <input type="hidden" name="post_id" value="<?= (int)$post['id'] ?>">
+                                        <input type="hidden" name="parent_comment_id" value="<?= (int)$c['id'] ?>">
+                                        <div class="comment-input-wrap">
+                                            <input type="text" name="content" class="comment-input reply-input"
+                                                   placeholder="Write a reply..." required>
+                                            <button type="submit" class="comment-send-btn">
+                                                <i class="fa fa-paper-plane"></i>
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+
                             </div>
                         </div>
                         <?php endforeach; ?>
+
                         <form action="index.php?url=comment/add" method="POST" class="comment-input-row">
                             <?= Security::field() ?>
                             <input type="hidden" name="post_id" value="<?= $post['id'] ?>">
@@ -280,7 +310,7 @@ require __DIR__ . '/../partials/header.php';
     <div class="modal">
         <div class="modal-header">
             <span class="modal-title">Edit profile</span>
-            <button class="modal-close" onclick="closeModal('edit-profile-modal')">
+            <button type="button" class="modal-close" onclick="closeModal('edit-profile-modal')">
                 <i class="fa fa-xmark"></i>
             </button>
         </div>
@@ -300,15 +330,15 @@ require __DIR__ . '/../partials/header.php';
                             <input type="file" name="profile_image" accept="image/*" hidden
                                    onchange="previewAvatar(this)">
                         </label>
-                </div>
+                    </div>
 
-                <div class="modal-field">
-                    <label>Cover photo</label>
-                    <label class="btn btn-ghost btn-sm">
-                        <i class="fa fa-image"></i> Upload cover photo
-                        <input id="cover-input" type="file" name="cover_image" accept="image/*" hidden>
-                    </label>
-                </div>
+                    <div class="modal-field">
+                        <label>Cover photo</label>
+                        <label class="btn btn-ghost btn-sm">
+                            <i class="fa fa-image"></i> Upload cover photo
+                            <input id="cover-input" type="file" name="cover_image" accept="image/*" hidden>
+                        </label>
+                    </div>
                 </div>
 
                 <div class="modal-field">
@@ -364,7 +394,7 @@ require __DIR__ . '/../partials/header.php';
     <div class="modal">
         <div class="modal-header">
             <span class="modal-title">Edit Post</span>
-            <button class="modal-close" onclick="closeModal('edit-post-modal')">
+            <button type="button" class="modal-close" onclick="closeModal('edit-post-modal')">
                 <i class="fa fa-xmark"></i>
             </button>
         </div>
@@ -414,7 +444,7 @@ require __DIR__ . '/../partials/header.php';
     <div class="modal">
         <div class="modal-header">
             <span class="modal-title">Edit Comment</span>
-            <button class="modal-close" onclick="closeModal('edit-comment-modal')">
+            <button type="button" class="modal-close" onclick="closeModal('edit-comment-modal')">
                 <i class="fa fa-xmark"></i>
             </button>
         </div>
@@ -438,9 +468,9 @@ require __DIR__ . '/../partials/header.php';
 function handleFriendAction(userId) {
     const btn = document.getElementById('friend-btn-' + userId);
     if (!btn) return;
-    
+
     btn.disabled = true;
-    
+
     fetch('index.php?url=friend/request', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -465,12 +495,12 @@ function handleFriendAction(userId) {
 
 function handleUnfriend(userId) {
     if (!confirm('Are you sure you want to unfriend this person?')) return;
-    
+
     const btn = document.getElementById('friend-btn-' + userId);
     if (!btn) return;
-    
+
     btn.disabled = true;
-    
+
     fetch('index.php?url=friend/unfriend', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -498,9 +528,9 @@ function handleUnfriend(userId) {
 function handleAcceptRequest(userId) {
     const btn = document.getElementById('friend-btn-' + userId);
     if (!btn) return;
-    
+
     btn.disabled = true;
-    
+
     fetch('index.php?url=friend/accept', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
