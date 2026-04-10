@@ -133,7 +133,7 @@ class MessageController {
             $stmt->execute([$conversationId]);
             
             $stmt = $this->db->prepare("
-                SELECT m.*, u.username, u.full_name, u.profile_image
+                SELECT m.*, UNIX_TIMESTAMP(m.created_at) AS created_at_unix, u.username, u.full_name, u.profile_image
                 FROM messages m
                 JOIN users u ON m.sender_id = u.id
                 WHERE m.id = ?

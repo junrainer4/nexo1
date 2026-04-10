@@ -81,13 +81,11 @@ function parseDateTime(datetime) {
 
 function timeAgo(datetime) {
     const parsed = parseDateTime(datetime);
-    if (!parsed) {
-        return 'just now';
-    }
-    let diff = Math.floor((Date.now() - parsed.getTime()) / 1000);
-    if (diff <= 0 || diff < 60) {
-        return 'just now';
-    }
+    if (!parsed) return 'just now';
+    const ms = parsed.getTime();
+    if (!ms || isNaN(ms)) return 'just now';
+    let diff = Math.floor((Date.now() - ms) / 1000);
+    if (!isFinite(diff) || diff < 60) return 'just now';
     if (diff < 3600) {
         const minutes = Math.floor(diff / 60);
         return minutes + ' min' + (minutes === 1 ? '' : 's') + ' ago';
@@ -108,7 +106,7 @@ function timeAgo(datetime) {
 }
 
 function refreshLiveTimes() {
-    document.querySelectorAll('time.live-time[data-time]').forEach(el => {
+    document.querySelectorAll('time.live-time[data-time]:not(.message-time)').forEach(el => {
         el.textContent = timeAgo(el.dataset.time);
     });
 }
@@ -1821,7 +1819,7 @@ function sendFloatingMessage(e) {
                     data.message.message,
                     true,
                     null,
-                    data.message.created_at,
+                    data.message.created_at_unix || data.message.created_at,
                     data.message.id,
                     data.message.is_read
                 );
@@ -2133,18 +2131,7 @@ function _scrollFloatingChatToBottom() {
 
 function updateLiveTimes() {
     document.querySelectorAll('.live-time[data-time]').forEach(el => {
-        const iso = el.dataset.time;
-        if (!iso) return;
-        const date = new Date(iso);
-        const diffSec = Math.floor((Date.now() - date.getTime()) / 1000);
-
-        let label;
-        if (diffSec < 60)        label = 'just now';
-        else if (diffSec < 3600) label = Math.floor(diffSec / 60) + ' mins ago';
-        else if (diffSec < 86400)label = Math.floor(diffSec / 3600) + ' hrs ago';
-        else                     label = Math.floor(diffSec / 86400) + ' days ago';
-
-        el.textContent = label;
+        el.textContent = timeAgo(el.dataset.time);
     });
 }
 

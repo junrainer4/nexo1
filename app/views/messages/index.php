@@ -118,7 +118,7 @@ require __DIR__ . '/../partials/header.php';
                                 <p><?= nl2br(htmlspecialchars($msg['message'])) ?></p>
                             </div>
                             <div class="message-meta">
-                                <time class="live-time message-time" data-time="<?= htmlspecialchars(time_iso($msg['created_at'])) ?>"><?= time_ago($msg['created_at']) ?></time>
+                                <time class="live-time message-time" data-time="<?= htmlspecialchars($msg['created_at_unix'] ?? time_iso($msg['created_at'])) ?>"><?= time_ago($msg['created_at_unix'] ?? $msg['created_at']) ?></time>
                                 <?php if ($msg['sender_id'] == $currentUserId): ?>
                                     <?php $isDelivered = ((int) $msg['is_read'] === 1); ?>
                                     <span class="message-status"><?= $isDelivered ? 'Delivered' : 'Sent' ?></span>
