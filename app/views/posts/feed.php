@@ -178,9 +178,6 @@ require __DIR__ . '/../partials/header.php';
                     <i class="fa-regular fa-comment"></i>
                     <span><?= $post['comment_count'] > 0 ? $post['comment_count'] : '' ?></span>
                 </button>
-                <button class="reaction-btn">
-                    <i class="fa-regular fa-share-from-square"></i>
-                </button>
                 <button class="reaction-btn save-btn" onclick="toggleSave(<?= $post['id'] ?>, this)" title="Save post"
                         data-saved="<?= !empty($post['user_saved']) ? '1' : '0' ?>">
                     <i class="<?= !empty($post['user_saved']) ? 'fa-solid' : 'fa-regular' ?> fa-bookmark"></i>
