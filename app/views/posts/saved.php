@@ -65,7 +65,7 @@ require __DIR__ . '/../partials/header.php';
                         </p>
                     </div>
                     <button class="gm-unsave-btn" onclick="unsavePost(<?= $post['id'] ?>, this)" title="Remove from saved">
-                        <i class="fa fa-bookmark-slash"></i>
+                        <i class="fa fa-trash"></i>
                     </button>
                 </div>
             </div>
