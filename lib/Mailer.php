@@ -13,15 +13,7 @@ class Mailer {
         $this->fromName = $fromName;
     }
 
-    /**
-     * Send an email.
-     *
-     * @param string $to      
-     * @param string $subject
-     * @param string $body    
-     * @param array  $inlineAttachments 
-     * @return bool
-     */
+    
     public function send(string $to, string $subject, string $body, array $inlineAttachments = []): bool {
         // Try SMTP (works on XAMPP / VPS, blocked on InfinityFree free tier)
         if ($this->sendSmtp($to, $subject, $body, $inlineAttachments)) {
