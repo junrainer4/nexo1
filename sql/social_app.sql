@@ -17,6 +17,25 @@ CREATE TABLE `comments` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
+
+INSERT INTO `comments` (`id`, `post_id`, `user_id`, `content`, `created_at`, `updated_at`) VALUES
+(6, 32, 8, 'YO', '2026-04-10 15:54:35', '2026-04-10 15:54:35');
+
+
+CREATE TABLE `comment_likes` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `comment_id` int(10) UNSIGNED NOT NULL,
+  `user_id` int(10) UNSIGNED NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+
+
+INSERT INTO `comment_likes` (`id`, `comment_id`, `user_id`, `created_at`) VALUES
+(1, 7, 8, '2026-04-10 15:57:38');
+
+
+
 CREATE TABLE `conversations` (
   `id` int(11) NOT NULL,
   `user1_id` int(11) NOT NULL,
@@ -24,7 +43,6 @@ CREATE TABLE `conversations` (
   `last_message_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
 
 
 INSERT INTO `conversations` (`id`, `user1_id`, `user2_id`, `last_message_at`, `created_at`) VALUES
@@ -61,6 +79,10 @@ CREATE TABLE `likes` (
   `user_id` int(10) UNSIGNED NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+INSERT INTO `likes` (`id`, `post_id`, `user_id`, `created_at`) VALUES
+(11, 32, 8, '2026-04-10 15:54:29');
 
 
 
@@ -101,7 +123,6 @@ CREATE TABLE `notifications` (
   `is_read` tinyint(1) DEFAULT 0,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
 
 
 INSERT INTO `notifications` (`id`, `user_id`, `type`, `actor_id`, `related_id`, `message`, `is_read`, `created_at`) VALUES
@@ -196,11 +217,11 @@ CREATE TABLE `users` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
+
 INSERT INTO `users` (`id`, `username`, `email`, `password`, `full_name`, `bio`, `profile_image`, `cover_image`, `mobile`, `birthday`, `gender`, `created_at`, `last_active_at`) VALUES
-(8, 'junrainer1', 'junrainer4@gmail.com', '$2y$10$UyBLIoXSLjMb0RhMohR50uXsd7GrFQBV49gammdpYEtmfDEwZzIWi', 'jun rainer', 'im new here', 'avatar_69d36a88275433.08953953.jpg', 'cover_69d7ac42415d54.20633715.jpg', NULL, '2006-09-04', 'Male', '2026-04-06 05:18:23', '2026-04-10 06:00:19'),
+(8, 'junrainer1', 'junrainer4@gmail.com', '$2y$10$UyBLIoXSLjMb0RhMohR50uXsd7GrFQBV49gammdpYEtmfDEwZzIWi', 'jun rainer', 'im new here', 'avatar_69d36a88275433.08953953.jpg', 'cover_69d7ac42415d54.20633715.jpg', NULL, '2006-09-04', 'Male', '2026-04-06 05:18:23', '2026-04-10 15:57:57'),
 (9, 'rosemarie1', 'junrainer2@gmail.com', '$2y$10$0wOaIDKJ3roa31wOO3aEhe6D8hc/ZRK5tHUQI.R5TsojhORXIk6P6', 'Rosemarie Buhisan', NULL, 'default.png', NULL, NULL, NULL, NULL, '2026-04-06 05:29:14', '2026-04-08 13:27:43'),
 (10, 'junrainer2', 'junrainer3@gmail.com', '$2y$10$/EXqjhcEkx3ulggRirKJi.tx0c2gIqmYQc/EUklNpXAhhPUCBX/RC', 'jun rainer secorin', NULL, 'default.png', NULL, NULL, NULL, NULL, '2026-04-07 11:57:46', '2026-04-08 09:19:50');
-
 
 
 CREATE TABLE `user_preferences` (
@@ -219,10 +240,17 @@ INSERT INTO `user_preferences` (`user_id`, `dark_mode`, `email_notifications`, `
 (9, 1, 1, 1, 'everyone', 'public', '2026-04-06 05:40:21'),
 (10, 1, 1, 1, 'everyone', 'public', '2026-04-07 11:57:46');
 
+
 ALTER TABLE `comments`
   ADD PRIMARY KEY (`id`),
   ADD KEY `idx_comments_post_id` (`post_id`),
   ADD KEY `idx_comments_user_id` (`user_id`);
+
+ALTER TABLE `comment_likes`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `unique_comment_like` (`comment_id`,`user_id`),
+  ADD KEY `idx_comment_id` (`comment_id`),
+  ADD KEY `idx_user_id` (`user_id`);
 
 ALTER TABLE `conversations`
   ADD PRIMARY KEY (`id`),
@@ -239,13 +267,11 @@ ALTER TABLE `friendships`
   ADD KEY `idx_user_id` (`user_id`),
   ADD KEY `idx_friend_id` (`friend_id`);
 
-
 ALTER TABLE `likes`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `uq_likes_post_user` (`post_id`,`user_id`),
   ADD KEY `idx_likes_post_id` (`post_id`),
   ADD KEY `idx_likes_user_id` (`user_id`);
-
 
 ALTER TABLE `messages`
   ADD PRIMARY KEY (`id`),
@@ -271,8 +297,10 @@ ALTER TABLE `posts`
   ADD PRIMARY KEY (`id`),
   ADD KEY `idx_posts_user_id` (`user_id`);
 
+
 ALTER TABLE `post_media`
   ADD PRIMARY KEY (`id`);
+
 
 ALTER TABLE `saved_posts`
   ADD PRIMARY KEY (`id`),
@@ -281,26 +309,34 @@ ALTER TABLE `saved_posts`
   ADD KEY `idx_user_id` (`user_id`),
   ADD KEY `idx_post_id` (`post_id`);
 
+
 ALTER TABLE `users`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `username` (`username`),
   ADD UNIQUE KEY `email` (`email`);
 
+
 ALTER TABLE `user_preferences`
   ADD PRIMARY KEY (`user_id`),
   ADD KEY `idx_user_id` (`user_id`);
 
+
 ALTER TABLE `comments`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+
+ALTER TABLE `comment_likes`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 ALTER TABLE `conversations`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
+
 ALTER TABLE `friendships`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=77;
 
+
 ALTER TABLE `likes`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 ALTER TABLE `messages`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
@@ -313,6 +349,7 @@ ALTER TABLE `password_resets`
 
 ALTER TABLE `posts`
   MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
+
 
 ALTER TABLE `post_media`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
@@ -330,13 +367,10 @@ ALTER TABLE `comments`
   ADD CONSTRAINT `fk_comments_post` FOREIGN KEY (`post_id`) REFERENCES `posts` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `fk_comments_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
-
 ALTER TABLE `likes`
   ADD CONSTRAINT `fk_likes_post` FOREIGN KEY (`post_id`) REFERENCES `posts` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `fk_likes_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
-
 ALTER TABLE `posts`
   ADD CONSTRAINT `fk_posts_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 COMMIT;
-
