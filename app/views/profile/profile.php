@@ -318,28 +318,30 @@ require __DIR__ . '/../partials/header.php';
             <?= Security::field() ?>
             <div class="modal-body">
 
-                <div class="avatar-upload-row">
-                    <img src="assets/uploads/<?= htmlspecialchars($user['profile_image']) ?>"
-                         alt="avatar" class="avatar-lg" id="avatar-preview"
-                         onerror="this.onerror=null; this.src='assets/images/default-profile.webp'"
-                         style="width:64px;height:64px;">
-                    <div>
-                        <p style="font-size:13.5px;font-weight:500;margin-bottom:6px;">Profile photo</p>
-                        <label class="btn btn-ghost btn-sm" style="cursor:pointer;">
-                            <i class="fa fa-upload" style="font-size:12px;"></i> Upload photo
-                            <input type="file" name="profile_image" accept="image/*" hidden
-                                   onchange="previewAvatar(this)">
-                        </label>
-                    </div>
-
-                    <div class="modal-field">
-                        <label>Cover photo</label>
-                        <label class="btn btn-ghost btn-sm">
-                            <i class="fa fa-image"></i> Upload cover photo
-                            <input id="cover-input" type="file" name="cover_image" accept="image/*" hidden>
-                        </label>
-                    </div>
-                </div>
+                <div style="display:flex;gap:16px;align-items:center;margin-bottom:16px;flex-wrap:wrap;">
+    <div style="display:flex;align-items:center;gap:10px;flex:1;">
+        <img src="assets/uploads/<?= htmlspecialchars($user['profile_image']) ?>"
+             alt="avatar" class="avatar-lg" id="avatar-preview"
+             onerror="this.onerror=null; this.src='assets/images/default-profile.webp'"
+             style="width:56px;height:56px;border-radius:50%;object-fit:cover;flex-shrink:0;">
+        <div>
+            <p style="font-size:12.5px;font-weight:500;margin-bottom:5px;color:var(--muted-fg);">Profile photo</p>
+            <label class="btn btn-ghost btn-sm" style="cursor:pointer;">
+                <i class="fa fa-upload" style="font-size:12px;"></i> Upload photo
+                <input type="file" name="profile_image" accept="image/*" hidden onchange="previewAvatar(this)">
+            </label>
+        </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;flex:1;">
+        <div>
+            <p style="font-size:12.5px;font-weight:500;margin-bottom:5px;color:var(--muted-fg);">Cover photo</p>
+            <label class="btn btn-ghost btn-sm" style="cursor:pointer;">
+                <i class="fa fa-image"></i> Upload cover photo
+                <input id="cover-input" type="file" name="cover_image" accept="image/*" hidden>
+            </label>
+        </div>
+    </div>
+</div>
 
                 <div class="modal-field">
                     <label>Full name</label>
