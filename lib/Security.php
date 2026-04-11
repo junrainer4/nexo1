@@ -57,7 +57,6 @@ class Security {
 
 
     public static function hardenSession(): void {
-        // Regenerate ID periodically to prevent fixation
         if (empty($_SESSION['_sess_init'])) {
             session_regenerate_id(true);
             $_SESSION['_sess_init'] = true;
